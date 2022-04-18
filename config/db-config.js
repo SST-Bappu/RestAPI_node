@@ -1,41 +1,39 @@
-const {
-    Sequelize,
-    DataTypes
-} = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 
-const sequelize = new Sequelize('student_node', 'postgres', '12345', {
-    host: 'localhost',
-    dialect: 'postgres'
+const sequelize = new Sequelize("cmtdb", "cmtuser", "cmt12345", {
+  host: "103.157.135.96",
+  dialect: "postgres",
 });
 
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("Datbase is connected");
+  })
+  .catch((err) => {
+    console.log("Error : ", err);
+  });
 
-sequelize.authenticate()
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.users = require("../models/user.model")(sequelize, DataTypes);
+db.clients = require("../models/client.model")(sequelize, DataTypes);
+
+async function dbsync(db) {
+  await db.sequelize
+    .sync({
+      force: false,
+    })
     .then(() => {
-        console.log('Datbase is connected');
-    })
-    .catch(err => {
-        console.log('Error : ', err)
-    })
-
-const db = {}
-
-db.Sequelize = Sequelize
-db.sequelize = sequelize
-
-db.students = require('../server/studentv2/studentv2.models')(sequelize, DataTypes)
-db.courses = require('../server/course/course.model')(sequelize, DataTypes)
-
-db.sequelize.sync({
-        force: false
-    })
-    .then(() => {
-        console.log("Database tables created successfully")
-    })
-
-db.students.belongsToMany(db.courses, {
-    through: 'student_course'
-})
-db.courses.belongsToMany(db.students, {
-    through: "student_course"
-})
-module.exports = db
+      console.log("Database Table created successfully");
+    });
+}
+dbsync(db);
+db.clients.hasMany(db.users);
+db.users.belongsToMany(db.clients, {
+  through: "client_user",
+});
+module.exports = db;
