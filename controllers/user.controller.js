@@ -2,10 +2,13 @@ const bcryptjs = require("bcryptjs");
 const { response } = require("express");
 const Joi = require("joi");
 const userService = require("../services/user.services");
+const db = require("../config/db-config");
+
 const {
   registerDataValidate,
   loginDataValidate,
 } = require("../validation/user.validation");
+const Client = db.clients;
 
 exports.register = async (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
@@ -25,18 +28,14 @@ exports.register = async (req, res, next) => {
       const { password } = req.body;
       const salt = bcryptjs.genSaltSync(10);
       req.body.password = bcryptjs.hashSync(password, salt);
-      // bcryptjs.genSalt(10, async function (err, salt) {
-      //   bcryptjs.hash(password, salt, async function (err, hash) {
-      //     req.body.password = hash;
-      //     console.log(hash);
-      //   });
-      // });
-      console.log(req.body.password);
-      const user = await userService.signup(req);
-      if (user) {
+      const result = await userService.signup(req);
+      if (result) {
         return res.status(200).send({
           message: "User created successfully",
-          user: user,
+          account: {
+            user: result.user,
+            client: result.client,
+          },
         });
       } else {
         res.status(409).json({

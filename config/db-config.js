@@ -27,13 +27,11 @@ async function dbsync(db) {
     .sync({
       force: false,
     })
-    .then(() => {
-      console.log("Database Table created successfully");
-    });
+    .then(() => {});
 }
-dbsync(db);
-db.clients.hasMany(db.users);
-db.users.belongsToMany(db.clients, {
-  through: "client_user",
-});
+// dbsync(db);
+// db.clients.hasMany(db.users);
+// db.users.belongsTo(db.clients, {
+//   through: "client_user",
+// });
 module.exports = db;

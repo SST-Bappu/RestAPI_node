@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNullL: false,
     },
-    email: {
+    username: {
       type: DataTypes.STRING,
       allowNullL: false,
     },
@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    // Foreign key to client table for the hrs
+    clientId: {
+      type: DataTypes.INTEGER,
     },
   });
   return user;
