@@ -1,5 +1,4 @@
 const bcryptjs = require("bcryptjs");
-const { response } = require("express");
 const Joi = require("joi");
 const userService = require("../services/user.services");
 const db = require("../config/db-config");
@@ -8,7 +7,6 @@ const {
   registerDataValidate,
   loginDataValidate,
 } = require("../validation/user.validation");
-const Client = db.clients;
 
 exports.register = async (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
@@ -48,8 +46,15 @@ exports.register = async (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  const { email, password } = req.body;
+  const { error } = loginDataValidate(req.body);
 
+  if (error) {
+    res.status(400).json({
+      message: "Invalid request",
+      error: error.details[0].message,
+    });
+  }
+  const { email, password } = req.body;
   userService.login({ email, password }, (error, result) => {
     if (error) {
       return next(error);
